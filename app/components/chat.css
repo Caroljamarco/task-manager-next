@@ -141,3 +141,150 @@
   outline: 2px solid #2563eb;
   outline-offset: 2px;
 }
+
+/* Tool card — the 4 lifecycle states */
+
+.tool-card {
+  margin-top: 0.5rem;
+  padding: 0.75rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.tool-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+/* input-streaming / input-available: neutral, pulsing */
+.tool-card-loading {
+  background: #f1f1f3;
+  color: #555;
+}
+
+.tool-card-skeleton {
+  height: 14px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #e2e2e5 25%, #efeff1 50%, #e2e2e5 75%);
+  background-size: 200% 100%;
+  animation: tool-skeleton-shimmer 1.3s infinite;
+}
+
+@keyframes tool-skeleton-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.tool-card-spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid #bbb;
+  border-top-color: #555;
+  border-radius: 50%;
+  animation: tool-spin 0.7s linear infinite;
+}
+
+@keyframes tool-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.tool-card-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.tool-card-chip {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+/* output-available: the real result, score-card grid */
+.tool-card-result {
+  background: white;
+  border: 1px solid #e0e0e0;
+}
+
+.tool-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.5rem;
+}
+
+.effort-card {
+  border-radius: 8px;
+  padding: 0.5rem 0.6rem;
+  border-left: 4px solid #999;
+  background: #fafafa;
+}
+
+.effort-card-title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.effort-card-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  margin-right: 0.4rem;
+}
+
+.effort-card-time {
+  font-size: 0.75rem;
+  color: #666;
+  display: inline-block;
+}
+
+.effort-low {
+  border-left-color: #16a34a;
+}
+.effort-low .effort-card-badge {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.effort-medium {
+  border-left-color: #d97706;
+}
+.effort-medium .effort-card-badge {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.effort-high {
+  border-left-color: #dc2626;
+}
+.effort-high .effort-card-badge {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* output-error: clearly different from everything else */
+.tool-card-error {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #991b1b;
+}
+
+.tool-card-error-text {
+  margin: 0;
+  font-size: 0.85rem;
+}

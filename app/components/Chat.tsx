@@ -3,6 +3,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { useEffect, useRef, useState } from "react";
+import ToolCard from "./ToolCard";
 
 export default function Chat() {
   const [input, setInput] = useState("");
@@ -61,9 +62,16 @@ export default function Chat() {
                 : "chat-message chat-message-assistant"
             }
           >
-            {message.parts.map((part, i) =>
-              part.type === "text" ? <span key={i}>{part.text}</span> : null
-            )}
+            {message.parts.map((part, i) => {
+              if (part.type === "text") {
+                return <span key={i}>{part.text}</span>;
+              }
+              if (part.type.startsWith("tool-")) {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                return <ToolCard key={i} part={part as any} />;
+              }
+              return null;
+            })}
           </div>
         ))}
 
