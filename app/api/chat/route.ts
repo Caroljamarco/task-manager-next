@@ -8,7 +8,7 @@
 import { anthropic } from "@ai-sdk/anthropic";
 import { streamText, convertToModelMessages, type UIMessage } from "ai";
 import { SYSTEM_PROMPT, MODEL_CONFIG } from "@/lib/ai/config";
-
+import { estimateTaskEffort } from "@/lib/ai/estimate-task-effort";
 export const runtime = "edge";
 export const maxDuration = 30;
 
@@ -22,6 +22,7 @@ export async function POST(req: Request) {
     messages: modelMessages,
     temperature: MODEL_CONFIG.temperature,
     maxOutputTokens: MODEL_CONFIG.maxTokens,
+    tools: { estimateTaskEffort },
   });
 
   return result.toUIMessageStreamResponse();
