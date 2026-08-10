@@ -288,3 +288,90 @@
   margin: 0;
   font-size: 0.85rem;
 }
+
+/* Empty state */
+.chat-empty-state {
+  margin: auto;
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #666;
+}
+.chat-empty-title {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+  color: #1a1a1a;
+}
+.chat-empty-subtitle {
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+.chat-empty-examples {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+.chat-empty-example {
+  background: white;
+  border: 1px solid #d4d4d4;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: #2563eb;
+}
+.chat-empty-example:hover {
+  background: #f1f5ff;
+}
+
+/* Chat-level error banner (different from the tool's own error card) */
+.chat-error-banner {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 10px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.chat-error-text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #991b1b;
+}
+.chat-retry-button {
+  align-self: flex-start;
+  background: #991b1b;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.chat-retry-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Mobile Safari: stop rubber-band scroll from fighting the page */
+.chat,
+.chat-scroll {
+  overscroll-behavior: contain;
+}
+
+/* route-level error boundary (error.tsx) */
+.route-error {
+  padding: 2rem;
+  text-align: center;
+}
+.route-error-retry {
+  margin-top: 1rem;
+  background: #1a1a1a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+}
