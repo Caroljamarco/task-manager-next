@@ -21,7 +21,10 @@
     "zod": "^4.4.3"
   },
   "overrides": {
-    "undici": "<8.0.3"
+    "undici": "<8.0.3",
+    "jsdom": {
+      "undici": "<8.0.3"
+    }
   },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
