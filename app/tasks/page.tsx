@@ -38,6 +38,7 @@ export default function Tasks() {
         className="border p-2 flex-1 rounded-md"
         type="text"
         placeholder="Add a task"
+        aria-label="Add a task"
         value={input}
         onChange={(e) => setInput(e.target.value)}
       />
