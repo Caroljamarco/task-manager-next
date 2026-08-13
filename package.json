@@ -20,12 +20,6 @@
     "react-dom": "19.2.4",
     "zod": "^4.4.3"
   },
-  "overrides": {
-    "undici": "<8.0.3",
-    "jsdom": {
-      "undici": "<8.0.3"
-    }
-  },
   "devDependencies": {
     "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4",
@@ -39,6 +33,7 @@
     "@vitejs/plugin-react": "^6.0.5",
     "eslint": "^9",
     "eslint-config-next": "16.2.10",
+    "happy-dom": "^20.11.2",
     "jsdom": "^30.0.1",
     "tailwindcss": "^4",
     "typescript": "^5",
