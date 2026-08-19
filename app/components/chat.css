@@ -115,6 +115,10 @@
   max-height: 120px;
 }
 
+.chat-input::placeholder {
+  color: #525252;
+}
+
 .chat-send-button,
 .chat-stop-button {
   border: none;
@@ -323,6 +327,16 @@
 }
 .chat-empty-example:hover {
   background: #f1f5ff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chat-empty-state {
+    color: #d1d5db;
+  }
+
+  .chat-empty-title {
+    color: #f3f4f6;
+  }
 }
 
 /* Chat-level error banner (different from the tool's own error card) */
