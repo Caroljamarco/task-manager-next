@@ -99,6 +99,7 @@ export default function Chat() {
                 ? "chat-message chat-message-user"
                 : "chat-message chat-message-assistant"
             }
+            aria-live={message.role === "assistant" ? "polite" : undefined}
           >
             {message.parts.map((part, i) => {
               if (part.type === "text") {
@@ -163,6 +164,7 @@ export default function Chat() {
           className="chat-input"
           value={input}
           onChange={(event) => setInput(event.target.value)}
+          aria-label="Type a message"
           placeholder="Type a message..."
           rows={1}
           disabled={isStreaming && !error}
