@@ -2,7 +2,7 @@
 
 ## O que é
 
-Task Manager é uma aplicação web para organizar tarefas e acompanhar seu andamento. Além da lista manual de tarefas, o projeto inclui um assistente de IA que transforma uma meta descrita em linguagem natural em uma lista de tarefas com estimativas de esforço e tempo.
+Task Manager é uma aplicação web para organizar tarefas e acompanhar seu andamento. Além da lista manual de tarefas, o projeto inclui um assistente de IA que transforma uma meta descrita em linguagem natural em uma lista de tarefas com estimativas de esforço e tempo. Pensado para quem quer organizar tarefas pessoais de forma simples, e para recrutadores ou avaliadores técnicos que querem ver, na prática, um assistente de IA com streaming e tool calling funcionando em produção.
 
 ## Screenshots
 
@@ -47,6 +47,16 @@ Task Manager é uma aplicação web para organizar tarefas e acompanhar seu anda
 
 5. Abra [http://localhost:3000](http://localhost:3000). A lista de tarefas fica em `/tasks` e o assistente de IA em `/assistant`.
 
+## Exemplo de uso
+
+No `/assistant`, digite uma meta em linguagem natural, por exemplo:
+
+> "Plan a weekend trip"
+
+O assistente quebra a meta em uma lista de 4 a 8 tarefas concretas (ex: "Book accommodation", "Research local activities", "Pack essentials"), chama a ferramenta `estimateTaskEffort` para cada uma, e exibe o resultado em cards coloridos por nível de esforço (verde/âmbar/vermelho) com uma estimativa de tempo.
+
+**Nota:** chamadas reais dependem de crédito ativo na API da Anthropic — veja a seção "Limitações conhecidas" abaixo.
+
 ## Variáveis de ambiente
 
 | Variável | O que faz | Obrigatória? | Onde conseguir |
@@ -83,6 +93,16 @@ Quando o assistente identifica uma meta que pode ser dividida em tarefas, ele ge
 ### Rate limiting
 
 Antes de chamar a API, a rota identifica o IP pelo header `x-forwarded-for` e aplica um limite de 5 requisições por minuto. A última mensagem do usuário também é limitada a 2000 caracteres. Requisições acima do limite recebem HTTP 429; mensagens maiores recebem HTTP 413.
+
+## Avaliação da lógica de estimativa de esforço
+
+Para validar a lógica de `estimateTaskEffort` sem depender de crédito de API (essa função não chama a Anthropic — usa uma tabela local de palavras-chave), criei um eval executável em `evals/estimate-task-effort.eval.ts`, rodável com `npm run eval:effort`.
+
+**Resultado:** testado localmente com 17 tarefas de exemplo, cobrindo casos óbvios e ambíguos. Taxa de acerto: 12/17 (70,6%).
+
+**Casos que falharam:** tarefas iniciadas por palavras não presentes na tabela de palavras-chave, como "Send", "Prepare", "Compare", "Schedule" e "Learn".
+
+**Limitação revelada:** a lógica depende da primeira palavra do título e de um conjunto específico de palavras-chave em inglês; termos não mapeados recebem a classificação padrão `medium`, o que pode gerar estimativas imprecisas para frases fora desse vocabulário.
 
 ## Decisões técnicas
 

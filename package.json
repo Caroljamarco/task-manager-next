@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "eval:effort": "node --experimental-strip-types evals/estimate-task-effort.eval.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.30",
