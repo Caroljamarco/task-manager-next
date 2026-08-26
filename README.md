@@ -1,111 +1,137 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Task Manager
 
-## Getting Started
+## O que é
 
-First, run the development server:
+Task Manager é uma aplicação web para organizar tarefas e acompanhar seu andamento. Além da lista manual de tarefas, o projeto inclui um assistente de IA que transforma uma meta descrita em linguagem natural em uma lista de tarefas com estimativas de esforço e tempo.
+
+## Screenshots
+
+![Task list view](./screenshots/tasks.png)
+
+![AI assistant view](./screenshots/assistant.png)
+
+## Como rodar localmente
+
+### Requisitos
+
+- Node.js 22 ou superior
+- npm
+- Uma chave da API da Anthropic para testar o fluxo real do assistente
+
+### Passo a passo
+
+1. Clone o repositório:
+
+   ```bash
+   git clone https://github.com/Caroljamarco/task-manager-next.git
+   cd task-manager-next
+   ```
+
+2. Instale as dependências:
+
+   ```bash
+   npm install
+   ```
+
+3. Crie um arquivo `.env.local` na raiz do projeto e adicione sua chave da Anthropic:
+
+   ```env
+   ANTHROPIC_API_KEY=sua_chave_aqui
+   ```
+
+4. Inicie o servidor de desenvolvimento:
+
+   ```bash
+   npm run dev
+   ```
+
+5. Abra [http://localhost:3000](http://localhost:3000). A lista de tarefas fica em `/tasks` e o assistente de IA em `/assistant`.
+
+## Variáveis de ambiente
+
+| Variável | O que faz | Obrigatória? | Onde conseguir |
+|---|---|---|---|
+| `ANTHROPIC_API_KEY` | Autentica as chamadas server-side para a API da Anthropic. | Sim para usar o assistente com chamadas reais. | [console.anthropic.com](https://console.anthropic.com/) |
+
+## Arquitetura
+
+O projeto usa o Next.js App Router. As principais áreas são:
+
+| Caminho | Responsabilidade |
+|---|---|
+| `app/tasks/page.tsx` | Lista de tarefas, adição, conclusão e remoção de tarefas. |
+| `app/assistant/page.tsx` | Página do assistente de IA. |
+| `app/components/Chat.tsx` | Interface do chat e estados do streaming. |
+| `app/components/ToolCard.tsx` | Exibe estados e resultados da ferramenta de estimativa. |
+| `app/api/chat/route.ts` | Rota server-side que conversa com a Anthropic. |
+| `lib/ai/config.ts` | Modelo, parâmetros e prompt do assistente. |
+| `lib/ai/estimate-task-effort.ts` | Ferramenta de estimativa com schema Zod. |
+| `lib/ai/rate-limit.ts` | Rate limiting e limite de tamanho de mensagem. |
+| `tests/` e `e2e/` | Testes unitários e de navegador. |
+
+### Fluxo do streaming de IA
+
+1. O componente de chat envia as mensagens do cliente para `POST /api/chat`.
+2. A rota converte as mensagens para o formato do modelo e chama `streamText` do Vercel AI SDK.
+3. O provider `@ai-sdk/anthropic` encaminha a solicitação para o modelo Anthropic configurado.
+4. A resposta volta em streaming para o navegador com `toUIMessageStreamResponse()`, permitindo que a interface seja atualizada enquanto a resposta é gerada.
+
+### Tool calling
+
+Quando o assistente identifica uma meta que pode ser dividida em tarefas, ele gera de 4 a 8 títulos e chama `estimateTaskEffort`. A ferramenta valida a entrada com Zod, estima nível de esforço (`low`, `medium` ou `high`) e minutos usando uma tabela local de palavras-chave, e devolve os resultados para o componente `ToolCard`.
+
+### Rate limiting
+
+Antes de chamar a API, a rota identifica o IP pelo header `x-forwarded-for` e aplica um limite de 5 requisições por minuto. A última mensagem do usuário também é limitada a 2000 caracteres. Requisições acima do limite recebem HTTP 429; mensagens maiores recebem HTTP 413.
+
+## Decisões técnicas
+
+- **Next.js App Router:** organiza páginas, layouts e rotas de API no mesmo projeto, com uma separação clara entre interface e código server-side.
+- **Edge runtime na rota de IA:** reduz a distância entre a requisição e a API externa e combina com o modelo de resposta em streaming.
+- **Vercel AI SDK:** fornece as abstrações de streaming, mensagens de UI e tool calling usadas pelo chat.
+- **Rate limit em memória:** `Map` e timestamps resolvem a proteção básica sem adicionar Redis, Upstash ou outro serviço externo. Isso é simples de explicar e suficiente para um projeto de portfólio.
+- **Zod:** valida a entrada e a saída da ferramenta de estimativa com schemas explícitos.
+- **Vitest e Testing Library:** cobrem os componentes React em testes rápidos e focados no comportamento.
+- **Playwright:** verifica o fluxo da interface em um navegador real.
+
+## Limitações conhecidas
+
+- A conta Anthropic usada neste projeto não tem crédito pago no momento. Chamadas reais retornam `"Your credit balance is too low to access the Anthropic API."` com HTTP 400, conforme confirmado pelos logs de produção da Vercel.
+- O código e a autenticação da API estão corretos e funcionais. Essa falha é uma limitação da conta, não da implementação.
+- O rate limiting é mantido em memória. Instâncias simultâneas de edge function possuem contagens independentes, portanto o limite não é perfeitamente preciso em escala. Isso é aceitável para um projeto de portfólio, mas não seria adequado para uma aplicação de alta escala.
+- As tarefas da página `/tasks` ficam somente no estado do navegador e não possuem persistência em banco de dados.
+- O assistente depende de uma chave válida e de crédito disponível na conta Anthropic para executar chamadas reais.
+
+## How AI tools built this
+
+Esta seção descreve o processo de forma direta:
+
+- A estrutura inicial do projeto, incluindo os comandos para criar e baixar pastas e a organização inicial, foi feita pela autora sem ajuda de IA.
+- A IA foi usada pela primeira vez para gerar partes de código como `app/api/chat/route.ts`, páginas do aplicativo e configurações relacionadas ao `package.json`.
+- A IA foi usada principalmente para debugar conflitos de versão entre o VS Code, o GitHub e o macOS.
+- Nos pontos de bifurcação, a IA sugeriu caminhos possíveis. A decisão final foi sempre da autora, avaliando o que era capaz de realizar e explicar de acordo com seu nível.
+- Em alguns momentos a IA sugeriu código com erros simples, como tags sem fechamento. Esses problemas foram identificados e corrigidos com facilidade.
+- A IA também realizou o trabalho final de testar o projeto e preparar este README.
+
+## Testes
+
+Os 14 testes unitários podem ser executados com:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm test
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Eles cobrem o componente de chat, incluindo estados vazios, envio, streaming, erro e resultado de ferramenta; a lista de tarefas, incluindo adicionar, concluir e remover; e os quatro estados visuais do `ToolCard`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+O teste E2E usa Playwright e pode ser executado com:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-
-## AI Task Assistant — Tool Contract (FE-07)
-
-The `/assistant` page's chat calls a server-side tool, `estimateTaskEffort`,
-defined in `lib/ai/estimate-task-effort.ts` and registered in
-`app/api/chat/route.ts`.
-
-### Tool: `estimateTaskEffort`
-
-**Description:** Estimates the effort level (low/medium/high) and time
-needed for each task in a list, using a server-side keyword-matching
-reference table. Called by the model after breaking a goal into tasks,
-before presenting the final list to the user.
-
-**Input schema (Zod):**
-```ts
-z.object({
-  tasks: z
-    .array(z.string().min(1))
-    .min(1)
-    .max(10),
-})
+```bash
+npx playwright install
+npm run test:e2e
 ```
 
-**Output schema (Zod):**
-```ts
-z.object({
-  estimates: z.array(
-    z.object({
-      title: z.string(),
-      effortLevel: z.enum(["low", "medium", "high"]),
-      estimatedMinutes: z.number(),
-    })
-  ),
-})
-```
+No GitHub Actions, o workflow configura Node.js 22, instala as dependências, executa `npm test`, instala o Chromium do Playwright e executa `npm run test:e2e` em pushes e pull requests para `main`.
 
-**Error case:** `execute` throws if a task title is empty after
-trimming, which surfaces as the tool's `output-error` state on the
-client.
+## Auditoria de acessibilidade
 
-### Tool part states (rendered in `app/components/ToolCard.tsx`)
-
-| State | Visual treatment |
-|---|---|
-| `input-streaming` | Neutral gray card, shimmering skeleton bar, "Preparing effort estimate…" |
-| `input-available` | Same neutral card + spinner + the task titles as chips, "Estimating effort for N tasks…" |
-| `output-available` | White result card, one color-coded mini-card per task (green/amber/red by effort level), title + badge + time estimate |
-| `output-error` | Red-bordered card with `role="alert"`, distinct from every other state, showing the error message |
-
-### Known limitation — API billing
-
-This project uses the Anthropic API directly (via `streamText` +
-`@ai-sdk/anthropic`), which has no free tier — unlike claude.ai, it
-bills per request from the very first call. The account used for local
-testing has not been funded with paid credits, per the internship's
-guidance to use free tools only.
-
-As a result, live requests currently fail with:
-`"Your credit balance is too low to access the Anthropic API."`
-
-This is **not a code defect**. Server logs confirm the request reaches
-Anthropic fully and correctly formatted — including the `estimateTaskEffort`
-tool definition, its JSON-schema-converted input schema, and the
-conversation history — and Anthropic rejects it purely on billing
-grounds (HTTP 400, `invalid_request_error`). All FE-07 evaluation
-criteria are implemented and verifiable in the source:
-
-- Tool defined with a typed Zod schema — see `lib/ai/estimate-task-effort.ts`
-- All four tool part states render with distinct visual treatment — see `app/components/ToolCard.tsx`
-- The tool result renders as a real component (color-coded effort cards), not raw text or JSON
-- A failed tool execution renders a designed error state (`output-error`), not a crash
-
-A question was posted in the program Q&A asking how billing costs
-should be handled given the free-tools-only guidance.
+O fluxo principal do assistente foi auditado manualmente. O resultado registrado em [AUDIT.md](./AUDIT.md) inclui Lighthouse Accessibility 95 e WAVE com zero erros após as correções. A auditoria também registra Lighthouse Performance 100, Best Practices 100 e SEO 100.
